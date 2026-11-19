@@ -8,6 +8,31 @@ PostgreSQL 15+
 
 > Redis (For background job queues / API polling)   
 
+## Installation & Monorepo Setup
+
+This project uses **npm workspaces** with a single root `package-lock.json`.
+
+### Initial Setup (Fresh Clone)
+```bash
+# Installs dependencies for root, frontend, and backend simultaneously
+npm install
+```
+
+### Adding New Packages
+Always manage packages using workspace flags from the root to maintain a single lockfile:
+
+```bash
+# Add a package to Frontend (Next.js)
+npm install <package-name> --workspace=frontend
+
+# Add a package to Backend (NestJS)
+npm install <package-name> --workspace=backend
+
+# Add a dev dependency
+npm install -D <package-name> --workspace=frontend
+```
+
+> **Note for team members:** Never commit nested `package-lock.json` files inside `frontend/` or `backend/`. Only the root `package-lock.json` should be tracked in version control.
 
 ## Note
 Please ensure you have a .env file at the root of the project with the necessary environment variables for database connections, payment gateways, and wholesale supplier APIs.

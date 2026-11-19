@@ -2,3 +2,8 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Prevent nested workspace lockfiles (monorepo uses single root lockfile)
+frontend/package-lock.json
+backend/package-lock.json
+
