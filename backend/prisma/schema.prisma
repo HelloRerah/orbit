@@ -94,6 +94,8 @@ model Order {
   createdAt            DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt            DateTime             @updatedAt @db.Timestamptz(3)
   orderStatusHistories OrderStatusHistory[]
+  rental               Rental?
+  license              License?
 
   @@index([userId, createdAt])
   @@index([status])
@@ -120,4 +122,29 @@ model OrderStatusHistory {
 
   @@index([orderId, createdAt])
   @@map("order_status_history")
+}
+
+model Rental {
+  id                   String   @id @default(uuid()) @db.Uuid
+  orderId              String   @unique @db.Uuid
+  order                Order    @relation(fields: [orderId], references: [id])
+  credentialsEncrypted String
+  startsAt             DateTime @db.Timestamptz(3)
+  endsAt               DateTime @db.Timestamptz(3)
+  createdAt            DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([endsAt])
+  @@map("rentals")
+}
+
+model License {
+  id                  String    @id @default(uuid()) @db.Uuid
+  orderId             String    @unique @db.Uuid
+  order               Order     @relation(fields: [orderId], references: [id])
+  licenseKeyEncrypted String
+  issuedAt            DateTime  @db.Timestamptz(3)
+  expiresAt           DateTime? @db.Timestamptz(3)
+  createdAt           DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@map("licenses")
 }
