@@ -25,6 +25,7 @@ model User {
   updatedAt            DateTime             @updatedAt @db.Timestamptz(3)
   orders               Order[]
   orderStatusHistories OrderStatusHistory[]
+  payments             Payment[]
 
   @@map("users")
 }
@@ -96,6 +97,7 @@ model Order {
   orderStatusHistories OrderStatusHistory[]
   rental               Rental?
   license              License?
+  payments             Payment[]
 
   @@index([userId, createdAt])
   @@index([status])
@@ -147,4 +149,46 @@ model License {
   createdAt           DateTime  @default(now()) @db.Timestamptz(3)
 
   @@map("licenses")
+}
+
+enum PaymentProvider {
+  MOCK
+  PAYFAST
+  YOCO
+  OZOW
+  PEACH
+}
+
+enum PaymentPurpose {
+  ORDER
+  TOPUP
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+model Payment {
+  id                String          @id @default(uuid()) @db.Uuid
+  userId            String          @db.Uuid
+  user              User            @relation(fields: [userId], references: [id])
+  purpose           PaymentPurpose
+  orderId           String?         @db.Uuid
+  order             Order?          @relation(fields: [orderId], references: [id])
+  provider          PaymentProvider
+  providerReference String?
+  amountZar         Decimal         @db.Decimal(10, 2)
+  status            PaymentStatus   @default(PENDING)
+  rawWebhook        Json?
+  paidAt            DateTime?       @db.Timestamptz(3)
+  createdAt         DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime        @updatedAt @db.Timestamptz(3)
+
+  @@unique([provider, providerReference])
+  @@index([orderId])
+  @@index([userId, createdAt])
+  @@map("payments")
 }
